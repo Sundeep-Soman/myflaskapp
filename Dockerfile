@@ -20,7 +20,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir mysqlclient
 
 # Copy the application files
-COPY app.py message.sql templates .
+
+COPY app.py .
+
+ADD templates/ templates/
 
 CMD ["python", "app.py"]
 
