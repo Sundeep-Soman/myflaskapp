@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-app-deployment
+  labels:
+    app: flask-app
+spec:
+  replicas: 1
+  selector:
+      matchLabels:
+       app: flask-app
+
+  template:
+     metadata:
+        labels:
+          app: flask-app
+     spec:
+       containers:
+        - name: flask-app-pod-ctr
+          image: imsundeepdocker/flaskapp:latest
+          env:
+             - name: MYSQL_HOST
+               value: "10.104.13.133" #service cluster IP of mysql
+             - name: MYSQL_USER
+               value: "root"
+             - name: MYSQL_PASSWORD
+               value: "admin"
+             - name: MYSQL_DB
+               value: "mydb"
+          ports:
+             - containerPort: 5000
+          imagePullPolicy: Always
+
