@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -20,14 +21,44 @@ spec:
           image: imsundeepdocker/flaskapp:latest
           env:
              - name: MYSQL_HOST
-               value: "10.96.156.236" #service cluster IP of mysql
+               #value: "10.96.78.95" #service cluster IP of mysql
+               value: "mysql"
              - name: MYSQL_USER
                value: "root"
              - name: MYSQL_PASSWORD
-               value: "admin"
+               valueFrom:
+                 secretKeyRef:
+                   name: flask-app-secrets
+                   key: MYSQL_PASSWORD
              - name: MYSQL_DB
                value: "mydb"
           ports:
              - containerPort: 5000
           imagePullPolicy: Always
+          
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: flask-app-secrets
+type: Opaque
+data:
+  MYSQL_PASSWORD: YWRtaW4=  # Base64-encoded value of your MySQL password
 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-service
+
+spec:
+  selector:
+    app: flask-app
+
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 5000
+      nodePort: 30007
+  type: NodePort
+---
